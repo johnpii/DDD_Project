@@ -1,0 +1,92 @@
+﻿@model IEnumerable<DDD_Project.Domain.Entities.Phone>
+
+@{
+    ViewData["Title"] = "Phones";
+}
+
+<h1>Phones</h1>
+
+<p>
+    <a asp-action="CreatePhone">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Country</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr data-id="@item.Id">
+                <td>@item.Name</td>
+                <td>@item.Year</td>
+                <td>@item.Country?.Name</td>
+                <td>
+                    <a asp-action="EditPhone" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="DetailsPhone" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="DeletePhone" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.js"></script>
+    <script>
+            document.addEventListener("DOMContentLoaded", function() {
+            const hubConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/DDDHub")
+                .build();
+
+            hubConnection.on("CreatePhone", function (phone) {
+                const tableBody = document.querySelector(".table tbody");
+                const newRow = document.createElement("tr");
+
+                newRow.innerHTML = `
+                    <td>${phone.name}</td>
+                    <td>${phone.year}</td>
+                    <td>${phone.countryName}</td>
+                    <td>
+                        <a href="/EditPhone/${phone.id}">Edit</a> |
+                        <a href="/DetailsPhone/${phone.id}">Details</a> |
+                        <a href="/DeletePhone/${phone.id}">Delete</a>
+                    </td>
+                `;
+
+                tableBody.appendChild(newRow);
+            });
+
+            hubConnection.on("EditPhone", function (phone) {
+                const row = document.querySelector(`.table tbody tr[data-id="${phone.id}"]`);
+                if (row) {
+                    row.innerHTML = `
+                        <td>${phone.name}</td>
+                        <td>${phone.year}</td>
+                        <td>${phone.countryName}</td>
+                        <td>
+                            <a href="/EditPhone/${phone.id}">Edit</a> |
+                            <a href="/DetailsPhone/${phone.id}">Details</a> |
+                            <a href="/DeletePhone/${phone.id}">Delete</a>
+                        </td>
+                    `;
+                }
+            });
+
+            hubConnection.on("DeletePhone", function (id) {
+                const row = document.querySelector(`.table tbody tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
+            });
+
+            hubConnection.start().catch(function (err) {
+                console.error(err.toString());
+            });
+        });
+    </script>
+}

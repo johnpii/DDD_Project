@@ -1,0 +1,84 @@
+﻿@model IEnumerable<DDD_Project.Domain.Entities.Country>
+
+@{
+    ViewData["Title"] = "Countries";
+}
+
+<h1>Countries</h1>
+
+<p>
+    <a asp-action="CreateCountry">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr data-id="@item.Id">
+                <td>@item.Name</td>
+                <td>
+                    <a asp-action="EditCountry" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="DetailsCountry" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="DeleteCountry" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.js"></script>
+    <script>
+            document.addEventListener("DOMContentLoaded", function() {
+            const hubConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/DDDHub")
+                .build();
+
+            hubConnection.on("CreateCountry", function (country) {
+                const tableBody = document.querySelector(".table tbody");
+                const newRow = document.createElement("tr");
+
+                newRow.innerHTML = `
+                    <td>${country.name}</td>
+                    <td>
+                        <a href="/EditCountry/${country.id}">Edit</a> |
+                        <a href="/DetailsCountry/${country.id}">Details</a> |
+                        <a href="/DeleteCountry/${country.id}">Delete</a>
+                    </td>
+                `;
+                newRow.setAttribute("data-id", country.id);
+                tableBody.appendChild(newRow);
+            });
+
+            hubConnection.on("EditCountry", function (country) {
+                const row = document.querySelector(`.table tbody tr[data-id="${country.id}"]`);
+                if (row) {
+                    row.innerHTML = `
+                        <td>${country.name}</td>
+                        <td>
+                            <a href="/EditCountry/${country.id}">Edit</a> |
+                            <a href="/DetailsCountry/${country.id}">Details</a> |
+                            <a href="/DeleteCountry/${country.id}">Delete</a>
+                        </td>
+                    `;
+                }
+            });
+
+            hubConnection.on("DeleteCountry", function (id) {
+                const row = document.querySelector(`.table tbody tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                }
+            });
+
+            hubConnection.start().catch(function (err) {
+                console.error(err.toString());
+            });
+        });
+    </script>
+}

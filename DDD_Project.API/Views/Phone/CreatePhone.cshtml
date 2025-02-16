@@ -1,0 +1,31 @@
+﻿@model CreatePhoneViewModel
+
+@{
+    ViewData["Title"] = "Create Phone";
+}
+
+<h1>Create Phone</h1>
+
+<form asp-action="CreatePhone">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Year" class="control-label"></label>
+        <input asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CountryId" class="control-label"></label>
+        <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
+    </div>
+    <div class="form-group mt-2 mb-2">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Phones">Back to List</a>
+</div>

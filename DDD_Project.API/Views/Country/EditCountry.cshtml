@@ -1,0 +1,22 @@
+﻿@model EditCountryViewModel
+
+@{
+    ViewData["Title"] = "Edit Country";
+}
+
+<h1>Edit Country</h1>
+
+<form asp-action="EditCountry">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-2 mb-2">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Countries">Back to List</a>
+</div>
